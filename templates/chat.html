@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm AI</title>
+    <style>
+        body, h1, h2, p, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #2a2a2a;
+            border-top: 10px solid #009688;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            height: 50px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        .logo-text {
+            display: inline-block; 
+            margin-left: -700px; 
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            height: 20px;
+            text-align: center;
+        }
+
+        header a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav li {
+            margin-right: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+        }
+        
+        #chatbot-container {
+            position: fixed;
+            top: 50%;
+            left: 10%;
+            width: 100%;
+            transform: translate(0, -50%);
+            max-width: 1100px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 999;
+            font-family: 'Arial', sans-serif;
+            transition: 0.3s ease-out;
+        }
+
+        .chat-header {
+            background-color: #009688;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 2px solid #00796b;
+        }
+
+        .chat-messages {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .user-message, .bot-message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: #e0f2f1;
+            color: #009688;
+            align-self: flex-end;
+            margin-left: 60%;
+        }
+
+        .bot-message {
+            background-color: #f0f0f0;
+            color: #333;
+            align-self: flex-start;
+            margin-right: 50%;
+        }
+
+        .chat-input {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-top: 2px solid #00796b;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+
+        #send-btn {
+            background-color: #009688;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease-out;
+        }
+
+        #send-btn:hover {
+            background-color: #00796b;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chatbotjs/dist/chatbot.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Farm AI Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/index">Predictor</a></li>
+                <li><a href="/chat">ChatBot</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/tracker">Tracker</a></li>
+                {% if session.loggedin %}
+                    <li><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a href="/">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div id="chatbot-container">
+            <div class="chat-header">Farm AI ChatBot</div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Type your message...">
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+    </main>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    
+    const responses = {
+    'hi': "Hello! How can I assist you today?",
+    'hi there': "Hi there! How can I be of service?",
+    'good day': "Good day! How may I assist you?",
+    'hello': "Hi there! How can I help you?",
+    'hey': "Hey! What can I do for you?",
+    'wheat': 'Wheat is a cereal grain widely cultivated for its seed. It is a staple food in many countries.',
+    'rice': 'Rice is a primary food source for more than half of the world\'s population. It is a staple crop.',
+    'corn': 'Corn, or maize, is a cereal grain first domesticated by indigenous peoples in southern Mexico.',
+    'soybean': 'Soybean is a legume and an important source of protein and oil for human and animal consumption.',
+    'potato': 'Potato is a starchy tuberous crop widely consumed as a staple food in many parts of the world.',
+    'tomato': 'Tomato is a popular fruit/vegetable that is widely used in cooking and salads.',
+    'carrot': 'Carrot is a root vegetable, usually orange in color, though purple, black, red, white, and yellow varieties also exist.',
+    'apple': 'Apple is a popular fruit known for its sweet taste and nutritional value.',
+    'banana': 'Banana is a tropical fruit rich in potassium and is a popular snack worldwide.',
+    'grape': 'Grapes are a type of berry that is commonly eaten fresh or used to make wine.',
+    'nice to see you': "Nice to see you! How can I help?",
+    'nitrogen': 'Farm AI provides information about Nitrogen. You can check the Nitrogen (N) levels in your soil to optimize crop growth.',
+    'phosphorus': 'Farm AI can help you understand Phosphorus levels in your soil, crucial for plant development.',
+    'potassium': 'Learn about Potassium (K) levels in your soil using Farm AI, essential for plant health and yield.',
+    'temperature': 'Discover insights about the current temperature, a vital factor affecting crop growth and cultivation.',
+    'humidity': 'Farm AI can provide information about humidity levels, which influence plant health and development.',
+    'rainfall': 'Check the rainfall data with Farm AI to understand the impact on crop irrigation and growth.',
+    'contact us': 'For inquiries or assistance, please feel free to contact us. You can reach us at [your contact information].',
+    'about us': 'Learn more about Farm AI and our mission to revolutionize agriculture. Explore our story and vision.',
+    'tracker': 'Use our tracker tool to monitor and analyze various aspects of your farm. Track crop growth, weather conditions, and more.',
+
+    'farm ai': ' To predict crop use type predict crop in chat   To suggest fertilizers type suggest fertilizer in chat        To predict disease type predict disease in chat                     To see weather type weather                                             to know about crops type crop name',
+    'predict crop': 'To predict crop, you can use our Crop Prediction Tool. location(preditor----> crop prediction) type "crop instructions" to see how to use it.',
+    'crop instructions': 'Fill in the Input Fields:Enter the Nitrogen (N) Ratio in the field labeled "N Ratio.Enter the Phosphorus (P) Ratio in the field labeled "P Ratio.Enter the Potassium (K) Ratio in the field labeled "K Ratio.Input the temperature in Celsius in the "Temperature (°C)" field Specify the humidity percentage in the "Humidity (%)" field. Enter the pH value in the "pH Value" field. You can use step values of 0.01 for precision.Input the rainfall in millimeters in the "Rainfall (mm)" field.Click on the "Predict" Button: After filling in all the required fields, click the "Predict" button',
+    'predict fertilizer': 'To suggest Fertlizer, you can use our fertlizer suggestions Tool. location  (preditor----> Fertlizer prediction)   type "fertilizer instructions" to see how to use it.',
+    'fertilizers': 'Farm AI provides information about various fertilizers. Ask about a specific fertilizer to learn more.',
+    'dap': 'DAP (Diammonium Phosphate) is a widely used phosphorus fertilizer. It contains high levels of phosphorus and nitrogen.',
+    '14-35-14': '14-35-14 is a fertilizer with a specific ratio of nitrogen, phosphorus, and potassium. It is suitable for certain crops.',
+    '28-28': '28-28 is a balanced fertilizer with equal proportions of nitrogen, phosphorus, and potassium. It provides general nutrients for plants.',
+    'Urea': 'Urea is a common nitrogen fertilizer that contains a high percentage of nitrogen. It is often used to promote leafy green growth.',
+    '17-17-17': '17-17-17 is a well-balanced fertilizer with equal proportions of nitrogen, phosphorus, and potassium. It suits various crops.',
+    '20-20': '20-20 is a fertilizer with balanced amounts of nitrogen, phosphorus, and potassium. It is suitable for general plant growth.',
+    'weather': 'Farm AI provides information about weather conditions. You can inquire about the current weather, forecasts, and more.',
+    'current weather': 'To check the current weather, please provide the location or specify the area you are interested in.',
+    'weather forecast': 'For a weather forecast, please provide the location and the timeframe you want to know about.',
+    'plow': 'The plow is a tool used for turning and loosening the soil. It is essential for preparing the ground for planting crops.',
+    'harrow': 'The harrow is a tool that breaks up soil clods and smoothens the surface. It helps in preparing a suitable seedbed for crops.',
+    'seeder': 'A seeder is a tool used for planting seeds in the soil at the desired depth and spacing. It ensures uniform distribution of seeds for optimal growth.',
+    'cultivator': 'A cultivator is a tool that removes weeds and aerates the soil around growing crops. It helps in maintaining a healthy and weed-free environment for plants.',
+    'sprayer': 'A sprayer is a tool used to apply fertilizers, pesticides, or herbicides to crops. It ensures the even distribution of these substances for crop protection.',
+    'tractor trailer': 'The tractor trailer is a transport tool that carries harvested crops or materials around the farm. It is essential for efficient material handling.',
+    'rotary tiller': 'A rotary tiller is a tool that prepares the soil for planting by breaking it into fine particles. It is useful for creating a suitable seedbed for crops.',
+    'disc harrow': 'The disc harrow is a tool that breaks up soil and incorporates crop residue into the topsoil. It helps in improving soil structure and fertility.',
+    'front loader': 'The front loader is a tool that lifts and moves materials such as hay, soil, or other farm supplies. It is versatile and aids in various farm tasks.',
+    'mower': 'A mower is a tool that cuts and conditions grass or crops for haymaking or silage. It ensures efficient harvesting and processing of forage crops.',
+    'insecticides': 'Insecticides are pesticides designed to control or eliminate insect pests that can damage crops. They target a wide range of insects that pose a threat to agricultural production.',
+    'herbicides': 'Herbicides are pesticides used to control or eliminate unwanted plants or weeds. They help in maintaining weed-free fields and ensuring optimal crop growth.',
+    'fungicides': 'Fungicides are pesticides that prevent and control fungal diseases in crops. They are essential for protecting plants from various types of fungi that can affect their health.',
+    'rodenticides': 'Rodenticides are pesticides designed to manage rodent pests that can harm crops or stored produce. They are used to control populations of rats and mice on farms.',
+    'nematicides': 'Nematicides are pesticides that target nematodes, which are microscopic worms harmful to plants. They help in protecting crops from nematode infestations and their detrimental effects.',
+    'apple': 'Apple is a popular fruit known for its sweet taste and nutritional value. It comes in various varieties with different flavors and textures.',
+    'banana': 'Banana is a tropical fruit rich in potassium and is a popular snack worldwide. It is convenient, nutritious, and comes with its own natural packaging.',
+    'orange': 'Orange is a citrus fruit known for its refreshing flavor and high vitamin C content. It is commonly consumed as fresh fruit or as a juice.',
+    'mango': 'Mango is a tropical fruit with a sweet and juicy taste, widely enjoyed during the summer. It comes in various varieties, each with its own unique flavor.',
+    'strawberry': 'Strawberry is a delicious berry that is often used in desserts, salads, and jams. It is known for its bright red color and sweet-tart flavor.',
+    'watermelon': 'Watermelon is a hydrating fruit with a sweet and juicy taste, perfect for hot days. It is often enjoyed fresh, especially during the summer season.',
+    'pineapple': 'Pineapple is a tropical fruit with a unique blend of sweetness and tartness. It is commonly used in fruit salads, smoothies, and desserts.',
+    'grape': 'Grapes are a type of berry commonly eaten fresh or used to make wine. They come in various colors, including red, green, and purple.',
+    'kiwi': 'Kiwi is a small, brown, fuzzy fruit with bright green flesh and a tangy flavor. It is rich in vitamin C and adds a refreshing twist to fruit salads.',
+    'avocado': 'Avocado is a creamy fruit known for its versatility and healthy monounsaturated fats. It is often used in salads, sandwiches, and as a base for guacamole.'
+  
+
+    }
+
+    function appendMessage(message, senderClass) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = senderClass;
+        messageDiv.textContent = message;
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function handleUserInput() {
+    const userMessage = userInput.value.trim().toLowerCase();
+    if (userMessage !== '') {
+        appendMessage(userMessage, 'user-message');
+        userInput.value = '';
+
+        // Check if there is a predefined response for the user input
+        if (responses.hasOwnProperty(userMessage)) {
+            const botResponse = responses[userMessage];
+            appendMessage(botResponse, 'bot-message');
+            Chatbot.sendMessage(botResponse);
+        } else {
+            // If no predefined match, display a default sorry message
+            const sorryMessage = "Sorry, I didn't understand. Please ask a different question.";
+            appendMessage(sorryMessage, 'bot-message');
+            Chatbot.sendMessage(sorryMessage);
+        }
+    }
+}
+
+
+    sendBtn.addEventListener('click', handleUserInput);
+
+    userInput.addEventListener('keyup', function (event) {
+        if (event.key === 'Enter') {
+            handleUserInput();
+        }
+    });
+
+    // Initialize the Chatbot after setting up event listeners
+    Chatbot.init({
+        container: 'chatbot-container',
+        defaultMessages: ['Welcome to Farm AI! How can I help you today?'],
+        customTheme: {
+            background: '#fff',
+            text: '#333',
+            userText: '#009688',
+            userBackground: '#e0f2f1'
+        },
+        events: {
+            onMessage: function (message) {
+                console.log('Chatbot message:', message);
+                appendMessage(message, 'bot-message');
+            },
+            onReply: function (reply) {
+                console.log('User reply:', reply);
+                appendMessage(reply, 'user-message');
+            }
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

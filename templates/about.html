@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm AI - About Us</title>
+    <style>
+        body, h1, h2, p, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        header {
+            background-color: #2a2a2a;
+            border-top: 10px solid #009688;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            height: 50px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        .logo-text {
+            display: inline-block;
+            margin-left: -700px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            height: 20px;
+            text-align: center;
+        }
+
+        header a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav li {
+            margin-right: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .about-us-text {
+            text-align: justify;
+            margin-bottom: 20px;
+            width: 50%;
+            float: left;
+        }
+
+        .about-us-image {
+            float: right;
+            margin: 20px 20px 20px 0;
+            width: 46%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .services-container {
+            margin: 20px auto;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        footer {
+            background-color: #2a2a2a;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .services-container {
+        margin: 20px 10%;
+        background-color: #f2f2f2;
+        padding: 20px;
+        border-radius: 8px;
+        overflow: hidden;
+        width: 80%;
+    }
+
+        .service-description {
+            text-align: justify;
+            float: left;
+            width: 60%;
+            
+        }
+
+        .service-image {
+            float: right;
+            width: 35%;
+            height: auto;
+            margin-left: 5%;
+            border-radius: 10px;
+        }
+        
+        .services-available {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .team-members {
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .team-member {
+            margin: 20px;
+            display: inline-block;
+        }
+
+        .team-member img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .team-member h2, .team-member p {
+            margin: 10px 0;
+        }
+        
+        .chatbot-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 20px 10%;
+        background-color: #f2f2f2;
+        padding: 20px;
+        border-radius: 8px;
+        overflow: hidden;
+        width: 80%;
+    }
+
+    .chatbot-text {
+        text-align: justify;
+        float: left;
+        width: 60%;
+    }
+
+    .chatbot-image {
+        float: right;
+        width: 35%;
+        height: auto;
+        margin-left: 5%;
+        border-radius: 10px;
+    }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Farm AI Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/index">Predictor</a></li>
+                <li><a href="/chat">ChatBot</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/tracker">Tracker</a></li>
+                {% if session.loggedin %}
+                    <li><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a href="/">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="about-us-text">
+            <h1>About Us</h1>
+            <br>
+            <p>Farm AI pioneers the convergence of agriculture and artificial intelligence, dedicated to transforming traditional farming with innovative technology. Our mission is to empower farmers through intelligent tools, enhancing productivity, sustainability, and efficiency.</p>
+            <br>
+            <p>Utilizing advanced AI algorithms, Farm AI analyzes crop health, weather, and soil conditions, enabling informed decisions and risk mitigation. The Predictor forecasts crop growth, diseases, and optimal harvest times, ensuring proactive measures for healthier crops. The integrated ChatBot offers real-time support, fostering a community among farmers.</p>
+            <br>
+            <p>In the Market section, a centralized platform connects farmers with buyers, streamlining product exchange for economic growth. Beyond technology, our personalized Tracker allows farmers to monitor crops and adapt to changing conditions. Farm AI is a holistic ecosystem, providing a user-friendly interface and comprehensive services for all farmers. Join us in cultivating a sustainable future through artificial intelligence.</p>
+    
+            <br>
+            <hr>
+        </div>
+
+        <div>
+        <img class="about-us-image" src="{{ url_for('static', filename='about.png') }}" alt="About Us Image">
+        </div>
+        <br>
+        <div class="services-available">
+            <h1>Services Available</h1>
+        </div>
+        
+        <div class="services-container">
+            <div class="service-container">
+                <div class="service-description">
+                    <h2>Crop Recommendation</h2>
+                    <br>
+                    <p>Our Crop Prediction service utilizes advanced machine learning models to forecast crop growth and predict optimal harvest times. By analyzing data related to soil conditions, weather patterns, and historical crop performance, we empower farmers with accurate insights. This allows for proactive decision-making, resulting in healthier crops and increased yields.</p>
+                </div>
+                <img class="service-image" src="{{ url_for('static', filename='acrop.jpg') }}" alt="Service 1 Image">
+            </div>
+        </div>
+
+        <div class="services-container">
+            <div class="service-container">
+                <div class="service-description">
+                    <h2>Fertilizer Suggesion</h2>
+                    <br>
+                    <p>The Fertilizer Prediction service harnesses sophisticated machine learning to assess soil conditions and crop characteristics, providing tailored fertilizer recommendations. By optimizing nutrient levels, farmers can maximize crop yields, reduce expenses, and foster sustainable agriculture. This predictive tool revolutionizes farming practices, promoting efficient resource utilization and environmental stewardship for a more productive and eco-friendly agricultural future..</p>
+                </div>
+                <img class="service-image" src="{{ url_for('static', filename='afert.jpg') }}" alt="Service 2 Image">
+            </div>
+        </div>
+
+        <div class="services-container">
+            <div class="service-container">
+                <div class="service-description">
+                    <h2>Disease Prediction</h2>
+                    <br>
+                    <p>Our disease prediction takes leaf photos, utilizing cutting-edge image analysis and machine learning. It predicts potential diseases affecting crops, providing accurate diagnostics. Additionally, it recommends suitable fertilizers based on identified deficiencies. The service includes step-by-step guidance for disease prevention and fertilizer application, empowering farmers with actionable insights for crop health management.</p>
+                </div>
+                <img class="service-image" src="{{ url_for('static', filename='adis.jpg') }}" alt="Service 3 Image">
+            </div>
+        </div>
+
+        <div class="services-container">
+            <div class="service-container">
+                <div class="service-description">
+                    <h2>Weather Forecasting</h2>
+                    <br>
+                    <p>Our Weather Forecast service delivers accurate predictions for temperature, humidity, and rainfall. Utilizing real-time data and advanced modeling, it aids farmers in planning agricultural activities effectively. This information allows for timely decision-making, optimizing crop management strategies and mitigating weather-related risks.</p>
+                </div>
+                <img class="service-image" src="{{ url_for('static', filename='awet.jpg') }}" alt="Service 4 Image">
+            </div>
+        </div>
+        <br>
+        <hr>
+        <div class="chatbot-container">
+            <div class="chatbot-text">
+                <h1>ChatBot Assistance</h1>
+                <br>
+                <p>Our ChatBot provides real-time assistance to farmers. Whether you have questions about crop management, need quick tips, or want to discuss farming strategies, our ChatBot is here to help. It's a friendly and intuitive tool designed to make your farming experience more productive and enjoyable.</p>
+            </div>
+            <img class="chatbot-image" src="{{ url_for('static', filename='chatbot.jpg') }}" alt="ChatBot Image">
+        </div>
+        <br>
+        <hr>
+        <div class="team-members">
+            <h1>Our Team</h1>
+            <div class="team-member">
+                <img src="{{ url_for('static', filename='team.jpg') }}" alt="Team Member 1">
+                <h3>Vamsi Krishna</h3>
+                <p>Student: ASEB</p>
+            </div>
+
+            <!-- Team member 2 -->
+            <div class="team-member">
+                <img src="{{ url_for('static', filename='team.jpg') }}" alt="Team Member 2">
+                <h3>Aditya Rajesh</h3>
+                <p>Student: ASEB</p>
+            </div>
+
+            <!-- Team member 3 -->
+            <div class="team-member">
+                <img src="{{ url_for('static', filename='team.jpg') }}" alt="Team Member 3">
+                <h3>Vaka Satwik</h3>
+                <p>Student: ASEB</p>
+            </div>
+
+            <!-- Team member 4 -->
+            <div class="team-member">
+                <img src="{{ url_for('static', filename='team.jpg') }}" alt="Team Member 4">
+                <h3>Dheeraj</h3>
+                <p>Student: ASEB</p>
+            </div>
+        </div>
+    </main>
+    <footer>
+        &copy; 2023 Farm AI. All rights reserved.
+    </footer>
+</body>
+</html>
+

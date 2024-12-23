@@ -1,0 +1,89 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Farm AI</title>
+    <!-- Your other head content here -->
+
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        main {
+            text-align: center;
+        }
+
+        .container {
+            border: 2px solid #009688;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 300px;
+            margin: auto;
+            background-color: #fff;
+        }
+
+        .container h1 {
+            margin-bottom: 16px; /* Adjust spacing as needed */
+        }
+
+        form {
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+        }
+
+        button {
+            margin-top: 10px;
+            background-color: #009688;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            align-items: center;
+        }
+
+        .error-msg {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="container">
+            <h1>Login</h1>
+            {% if msg %}
+                <p class="error-msg">{{ msg }}</p>
+            {% endif %}
+            <form action="/" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+        </div>
+        <p class="signup-link">Don't have an account? <a href="/signup">Sign up here</a>.</p>
+    </main>
+</body>
+</html>

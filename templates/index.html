@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm AI</title>
+    <style>
+
+body, h1, h2, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    background-color: #f0f0f0;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+/* Style the header with a background color and a top border */
+header {
+    background-color: #2a2a2a;
+    border-top: 10px solid #009688;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    height: 50px;
+}
+
+/* Style the logo in the header */
+.logo img {
+    height: 50px;
+    width: auto;
+}
+
+.logo-text {
+    display: inline-block; 
+    margin-left: -700px; 
+}
+
+
+nav ul {
+    list-style: none;
+    display: flex;
+    height: 20px;
+    text-align: center;
+    
+}
+header a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    
+}
+
+nav li {
+    margin-right: 30px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #fff;
+    
+}
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+
+.service {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    width: 35%; 
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Style the service logos */
+.service-logo img {
+    height: 60px;
+    width: auto;
+    
+}
+
+/* Style the service titles */
+.service h2 {
+    font-size: 22px;
+    color: #009688;
+    margin-bottom: 10px;
+}
+
+/* Style the service descriptions */
+.service p {
+    font-size: 16px;
+}
+
+/* Style the "Learn More" arrow links */
+.arrow a {
+    text-decoration: none;
+    color: #009688;
+    display: inline-block;
+    margin-top: 10px;
+    transition: transform 0.3s;
+}
+
+.arrow a:hover {
+    transform: translateX(5px);
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Farm AI Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/index">predictor</a></li>
+                <li><a href="/chat">chatBot</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/tracker">Tracker</a></li>
+                {% if session.loggedin %}
+                    <li><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a href="/">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="service">
+            <div class="service-logo">
+                <img src="{{ url_for('static', filename='rec.png') }}" alt="Crop Recommendation Logo">
+            </div>
+            <h2>Crop Recommendation</h2>
+            <p>Get personalized crop recommendations for your farm.</p>
+            <div class="arrow">
+                <a href="cpredict">Learn More</a>
+            </div>
+        </section>
+        <section class="service">
+            <div class="service-logo">
+                <img src="{{ url_for('static', filename='fert.jpg') }}" alt="Fertilizer Recommendation Logo">
+            </div>
+            <h2>Fertilizer Recommendation</h2>
+            <p>Find the right fertilizers for your crops.</p>
+            <div class="arrow">
+                <a href="fertilizer">Learn More</a>
+            </div>
+        </section>
+        <section class="service">
+            <div class="service-logo">
+                <img src="{{ url_for('static', filename='dis.png') }}" alt="Disease Prediction Logo">
+            </div>
+            <h2>Disease Prediction</h2>
+            <p>Predict and prevent crop diseases.</p>
+            <div class="arrow">
+                <a href="disease">Learn More</a>
+            </div>
+        </section>
+        <section class="service">
+            <div class="service-logo">
+                <img src="{{ url_for('static', filename='weat.jpg') }}" alt="Weather Forecasting Logo">
+            </div>
+            <h2>Weather Forecasting</h2>
+            <p>Stay informed about weather conditions.</p>
+            <div class="arrow">
+                <a href="weather">Learn More</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

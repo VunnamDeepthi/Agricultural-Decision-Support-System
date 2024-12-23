@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker - Farm AI</title>
+    <style>
+        body, h1, h2, p, ul, li, form, input, textarea, button {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #2a2a2a;
+            border-top: 10px solid #009688;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav li {
+            margin-right: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            margin-top: 30px;
+        }
+
+        .details-container {
+            margin-top: 30px;
+        }
+
+        .user-details-container,
+        .crop-fert-details-container {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px #009688;
+            margin-top: 20px;
+        }
+
+        .details-container button {
+            background-color: #009688;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            float: right;
+        }
+
+        .details-container::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-content {
+            background-color: white;
+            padding: 15px; /* Reduced padding */
+            border-radius: 10px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 300px; /* Reduced width */
+            width: 100%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .popup-content h2 {
+            font-size: 18px; /* Adjusted font size */
+            margin-bottom: 15px; /* Adjusted margin */
+            color: #333;
+        }
+
+        .popup-content label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px; /* Adjusted font size */
+        }
+
+        .popup-content input,
+        .popup-content textarea {
+            width: 100%;
+            padding: 8px; /* Reduced padding */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px; /* Adjusted font size */
+            margin-bottom: 8px; /* Adjusted margin */
+        }
+
+        .popup-content button {
+            background-color: #009688;
+            color: white;
+            padding: 8px 16px; /* Reduced padding */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px; /* Adjusted font size */
+        }
+
+        .popup-content button:hover {
+            background-color: #00796b;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Farm AI Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/index">predictor</a></li>
+                <li><a href="/chat">chatBot</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/tracker">Tracker</a></li>
+                {% if session.loggedin %}
+                    <li><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a href="/">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <!-- Crop Details Container -->
+        <div class="details-container crop-fert-details-container">
+            <section class="section">
+                <h1>Crop Details</h1>
+                {% if crop_details %}
+                    {% for crop_detail in crop_details %}
+                        <p><strong>crop_id:</strong> {{ crop_detail[0] }}</p>
+                        <p><strong>Date :</strong> {{ crop_detail[2] }}</p>
+                        <p><strong>Input :</strong> {{ crop_detail[3] }}</p>
+                        <p><strong>Prediction :</strong> {{ crop_detail[4] }}</p>
+                        <p><strong>Rating :</strong> {{ crop_detail[5] }}</p>
+                        <p><strong>Review :</strong> {{ crop_detail[6] }}</p>
+                        <button onclick="showReviewPopup('crop')">Add Review</button>
+                        <br>
+                        <br>
+                        <hr>
+                    {% endfor %}
+                {% else %}
+                    <p>No details available.</p>
+                {% endif %}
+            </section>
+        </div>
+
+        <!-- Fertilizer Details Container -->
+        <div class="details-container crop-fert-details-container">
+            <section class="section">
+                <h1>Fertilizer Details</h1>
+                {% if fert_details %}
+                    {% for fert_detail in fert_details %}
+                        <p><strong>Fert_id:</strong> {{ fert_detail[0] }}</p>
+                        <p><strong>Date:</strong> {{ fert_detail[2] }}</p>
+                        <p><strong>input details:</strong> {{ fert_detail[3] }}</p>
+                        <p><strong>prediction:</strong> {{ fert_detail[4] }}</p>
+                        <p><strong>Rating:</strong> {{ fert_detail[5] }}</p>
+                        <p><strong>Review:</strong> {{ fert_detail[6] }}</p>
+                        <button onclick="showReviewPopup('fert')">Add Review</button>
+                        <br>
+                        <br>
+                        <hr>
+                    {% endfor %}
+                {% else %}
+                    <p>No details available.</p>
+                {% endif %}
+            </section>
+        </div>
+
+        <div class="details-container crop-fert-details-container">
+            <section class="section">
+                <h1>Disease Details</h1>
+                {% if dis_details %}
+                    {% for dis_detail in dis_details %}
+                        <p><strong>disease_id:</strong> {{ dis_detail[0] }}</p>
+                        <p><strong>Date :</strong> {{ dis_detail[2] }}</p>
+                        <img src="{{ dis_details[3] }}" alt="Plant Image">
+                        <p><strong>Prediction :</strong> {{ dis_detail[4] }}</p>
+                        <p><strong>Pesticide :</strong> {{ dis_detail[5] }}</p>
+                        <p><strong>Rating :</strong> {{ dis_detail[6] }}</p>
+                        <p><strong>Review :</strong> {{ dis_detail[7] }}</p>
+                        <button onclick="showReviewPopup('dis')">Add Review</button>
+                        <br>
+                        <br>
+                        <hr>
+                    {% endfor %}
+                {% else %}
+                    <p>No details available.</p>
+                {% endif %}
+            </section>
+        </div>
+
+        <!-- Review Popup -->
+        <div id="reviewPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="hideReviewPopup()">&times;</span>
+                <h2>Add Review</h2>
+                <!-- Review form -->
+                <form action="/tracker" method="POST" class="contact-form">
+                    <input type="hidden" name="csrf_token" value="{{ vamsi }}">
+                    <input type="hidden" name="type" id="reviewType">
+                    <label for="crop_id">Crop ID:</label>
+                    <input type="text" id="crop_id" name="crop_id" required>
+                    <input type="hidden" name="review_type" value="{{ review_type }}">
+                    <label for="rating">Rating:</label>
+                    <input type="number" id="rating" name="rating" min="1" max="5" required>
+                    <br>
+                    <label for="review">Review:</label>
+                    <textarea id="review" name="review" rows="4" required></textarea>
+                    <button type="submit">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script>
+        function showReviewPopup(type) {
+            var popup = document.getElementById("reviewPopup");
+            var reviewTypeInput = document.getElementById("reviewType");
+            reviewTypeInput.value = type;
+            popup.style.display = "block";
+        }
+
+        function hideReviewPopup() {
+            var popup = document.getElementById("reviewPopup");
+            popup.style.display = "none";
+        }
+    </script>
+</body>
+</html>

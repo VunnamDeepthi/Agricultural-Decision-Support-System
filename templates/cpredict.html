@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm AI</title>
+    
+
+    <style>
+        .input-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            width: 450px;
+            text-align: center;
+            margin-left: 30%;
+            margin-top: 20px;
+        }
+
+        .input-form h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+            width: 140px;
+        }
+
+        input[type="number"] {
+            width: 60%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block;
+            
+        }
+
+        button[type="submit"] {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #555;
+        }
+
+        
+        body, h1, h2, p, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #2a2a2a;
+            border-top: 10px solid #009688;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            height: 20px;
+            text-align: center;
+            
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            
+        }
+
+        nav li {
+            margin-right: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Farm AI Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/index">predictor</a></li>
+                <li><a href="/chat">chatBot</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/tracker">Tracker</a></li>
+                {% if session.loggedin %}
+                    <li><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a href="/">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="input-form">
+            <h1>Predict Crop</h1>
+            <form id="crop-prediction-form">
+                <label for="n">N Ratio:</label>
+                <input type="number" id="n" name="n" required>
+                
+                <label for="p">P Ratio:</label>
+                <input type="number" id="p" name="p" required>
+                
+                <label for="k">K Ratio:</label>
+                <input type="number" id="k" name="k" required>
+                
+                <label for="temperature">Temperature (°C):</label>
+                <input type="number" id="temperature" name="temperature" required>
+                
+                <label for="humidity">Humidity (%):</label>
+                <input type="number" id="humidity" name="humidity" required>
+                
+                <label for="ph">pH Value:</label>
+                <input type="number" id="ph" name="ph" step="0.01" required>
+                
+                <label for="rainfall">Rainfall (mm):</label>
+                <input type="number" id="rainfall" name="rainfall" required>
+                
+                <button type="submit" onclick="return getPrediction()">Predict</button>
+            </form>
+            <div id="prediction-result"></div>
+    </main>
+    <script>
+        function getPrediction() {
+            const n = document.getElementById('n').value;
+            const p = document.getElementById('p').value;
+            const k = document.getElementById('k').value;
+            const temperature = document.getElementById('temperature').value;
+            const humidity = document.getElementById('humidity').value;
+            const ph = document.getElementById('ph').value;
+            const rainfall = document.getElementById('rainfall').value;
+
+            const inputData = {
+                n: parseFloat(n),
+                p: parseFloat(p),
+                k: parseFloat(k),
+                temperature: parseFloat(temperature),
+                humidity: parseFloat(humidity),
+                ph: parseFloat(ph),
+                rainfall: parseFloat(rainfall)
+            };
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputData),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                const resultDiv = document.getElementById('prediction-result');
+                resultDiv.innerHTML = `The predicted result is: <strong>${data.prediction}</strong>`;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
+            // Prevent the form from being submitted via the default browser behavior
+            return false;
+        }
+    </script>
+</body>
+</html>

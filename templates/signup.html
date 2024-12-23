@@ -1,0 +1,92 @@
+<!-- signup.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Farm AI</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        main {
+            text-align: center;
+        }
+
+        .container {
+            border: 2px solid #009688;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 300px;
+            margin: auto;
+            background-color: #fff;
+        }
+
+        .container h1 {
+            margin-bottom: 16px; /* Adjust spacing as needed */
+        }
+
+        form {
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+        }
+
+        button {
+            margin-top: 10px;
+            background-color: #009688;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="container">
+            <h1>Sign Up</h1>
+            <form action="/signup" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <label for="phoneno">Phone Number:</label>
+                <input type="text" id="phoneno" name="phoneno" required>
+
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" required>
+
+                <label for="occupation">Occupation:</label>
+                <input type="text" id="occupation" name="occupation" required>
+
+                <label for="crop">Crop Cultivating:</label>
+                <input type="text" id="crop" name="crop" required>
+
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+        <p>Already have an account? <a href="/">Login here</a>.</p>
+    </main>
+</body>
+</html>

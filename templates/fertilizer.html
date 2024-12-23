@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm AI</title>
+    
+
+    <style>
+        .input-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            width: 450px;
+            text-align: center;
+            margin-left: 30%;
+            margin-top: 20px;
+        }
+
+        .input-form h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #009688;
+        }
+
+        label {
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+            width: 140px;
+        }
+
+        select#croptype, select#soiltype {
+            width: 60%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        input[type="number"] {
+            width: 60%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block;
+            
+        }
+
+        button[type="submit"] {
+            background-color: #009688;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #555;
+        }
+
+        
+        body, h1, h2, p, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #2a2a2a;
+            border-top: 10px solid #009688;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            height: 20px;
+            text-align: center;
+            
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            
+        }
+
+        nav li {
+            margin-right: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Farm AI Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/index">predictor</a></li>
+                <li><a href="/chat">chatBot</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/tracker">Tracker</a></li>
+                {% if session.loggedin %}
+                    <li><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a href="/">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="input-form">
+            <h1>Suggest Fertilizers</h1>
+            <form id="fertilizer-prediction-form">
+
+                <label for="temperature">Temperature:</label>
+                <input type="number" id="temperature" name="temperature" required>
+        
+
+                <label for="humidity">Humidity:</label>
+                <input type="number" id="humidity" name="humidity" required>
+        
+                <label for="moisture">Moisture:</label>
+                <input type="number" id="moisture" name="moisture" required>
+        
+                <label for="soiltype">Soil Type:</label>
+                <select id="soiltype" name="soiltype" required>
+                    <option value="">Select Soil Type</option>
+                    <option value="1">Loamy</option>
+                    <option value="2">Sandy</option>
+                    <option value="3">Clayey</option>
+                    <option value="4">Black</option>
+                    <option value="5">Red</option>
+                </select>
+                
+        
+                <label for="croptype">Crop Type:</label>
+                <select id="croptype" name="croptype" required>
+                    <option value="">Select Crop Type</option>
+                    <option value="1">Sugarcane</option>
+                    <option value="2">Cotton</option>
+                    <option value="3">Millets</option>
+                    <option value="4">Paddy</option>
+                    <option value="5">Pulses</option>
+                    <option value="6">Wheat</option>
+                    <option value="7">Tobacco</option>
+                    <option value="8">Barley</option>
+                    <option value="9">Oil seeds</option>
+                    <option value="10">Ground Nuts</option>
+                    <option value="11">Maize</option>
+                </select>                
+        
+                <label for="nitrogen">Nitrogen:</label>
+                <input type="number" id="nitrogen" name="nitrogen" required>
+        
+                <label for="potassium">Potassium:</label>
+                <input type="number" id="potassium" name="potassium" required>
+        
+                <label for="phosphorous">Phosphorous:</label>
+                <input type="number" id="phosphorous" name="phosphorous" required>
+        
+                <button type="submit">Get Suggestion</button>
+            </form>
+            <p id="prediction-result"></p>
+        </div>        
+    </main>
+    <script>
+        document.getElementById('fertilizer-prediction-form').onsubmit = function(event) {
+            event.preventDefault();
+            if (!this.hasBeenSubmitted) {
+                this.hasBeenSubmitted = true;
+                getPrediction();
+        } 
+        };
+
+        function getPrediction() {
+            const temperature = document.getElementById('temperature').value;
+            const humidity = document.getElementById('humidity').value;
+            const moisture = document.getElementById('moisture').value;
+            const soilType = document.getElementById('soiltype').value;
+            const cropType = document.getElementById('croptype').value;
+            const nitrogen = document.getElementById('nitrogen').value;
+            const potassium = document.getElementById('potassium').value;
+            const phosphorous = document.getElementById('phosphorous').value;
+
+            const inputData = {
+                temperature: parseFloat(temperature),
+                humidity: parseFloat(humidity),
+                moisture: parseFloat(moisture),
+                Soil_Num: parseInt(soilType, 10),
+                Crop_Num: parseInt(cropType, 10),
+                nitrogen: parseFloat(nitrogen),
+                potassium: parseFloat(potassium),
+                phosphorous: parseFloat(phosphorous)
+            };
+
+            fetch('/fpredict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputData),
+            })
+            .then(response => response.json())
+            .then((data) => {
+                const resultDiv = document.getElementById('prediction-result');
+                resultDiv.innerHTML = `The predicted fertilizer is: <strong>${data.prediction}</strong>`;
+
+                // Displaying the benefits
+                const benefits = data.benefits;
+                if (benefits && benefits.length) {
+                    resultDiv.innerHTML += '<h3>Benefits:</h3><ul>';
+                    benefits.forEach(benefit => {
+                        resultDiv.innerHTML += `<li>${benefit}</li>`;
+                    });
+                    resultDiv.innerHTML += '</ul>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('prediction-result').textContent = 'An error occurred!';
+            });
+        }
+
+    </script>  
+    
+    
+</body>
+</html>

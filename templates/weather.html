@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecasting</title>
+    <style>
+        body, h1, h2, p, ul, li {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #2a2a2a;
+            border-top: 10px solid #009688;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            height: 20px;
+            text-align: center;
+        }
+
+        header a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav li {
+            margin-right: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+
+        #weather-section {
+            max-width: 800px;
+            margin: auto; 
+            padding: 20px;
+            background: #FFFFFF;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            border-radius: 10px; 
+        }
+
+        #location-input {
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        #city-input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px; /* Adjusted margin */
+        }
+
+        #location-input button {
+            background-color: #009688;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-left: 5px; /* Reduced space between buttons */
+        }
+
+        button:hover {
+            background-color: #00796b;
+        }
+
+        #today-weather, #tomorrow-weather {
+            background-color: #fff;
+            padding: 5px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            color: #009688; /* Adds a touch of color to headers */
+            margin-bottom: 15px; /* Spacing for visual separation */
+        }
+
+        p {
+            line-height: 1.4; /* Improves readability */
+            margin-bottom: 10px; /* Consistent spacing between paragraphs */
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Farm AI Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/index">predictor</a></li>
+                <li><a href="/chat">chatBot</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/tracker">Tracker</a></li>
+                {% if session.loggedin %}
+                    <li><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a href="/login">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="weather-section">
+            <div id="location-input">
+                <input type="text" id="city-input" placeholder="Enter city name">
+                <button onclick="fetchWeather()">Get Weather</button>
+                <button onclick="useCurrentLocation()">Use Current Location</button>
+            </div>
+            <div id="today-weather">
+                <h3>Today's Weather</h3>
+                <p>Temperature: <span id="today-temp"></span>°C</p>
+                <p>Rainfall: <span id="today-rainfall"></span>mm</p>
+                <p>Humidity: <span id="today-humidity"></span>%</p>
+                <p>Pressure: <span id="today-pressure"></span>hPa</p>
+            </div>
+            <div id="tomorrow-weather">
+                <h3>Tomorrow's Weather</h3>
+                <p>Temperature: <span id="tomorrow-temp"></span>°C</p>
+                <p>Rainfall: <span id="tomorrow-rainfall"></span>mm</p>
+                <p>Humidity: <span id="tomorrow-humidity"></span>%</p>
+                <p>Pressure: <span id="tomorrow-pressure"></span>hPa</p>
+            </div>
+        </section>
+    </main>
+    <script>
+        function fetchWeather(city = '') {
+            let url = city ? `/get-weather?city=${city}` : '/get-weather';
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('today-temp').textContent = data.today.temperature;
+                    document.getElementById('today-rainfall').textContent = data.today.rainfall;
+                    document.getElementById('today-humidity').textContent = data.today.humidity;
+                    document.getElementById('today-pressure').textContent = data.today.pressure;
+
+                    document.getElementById('tomorrow-temp').textContent = data.tomorrow.temperature;
+                    document.getElementById('tomorrow-rainfall').textContent = data.tomorrow.rainfall;
+                    document.getElementById('tomorrow-humidity').textContent = data.tomorrow.humidity;
+                    document.getElementById('tomorrow-pressure').textContent = data.tomorrow.pressure;
+                })
+                .catch(error => console.error('Error fetching weather data:', error));
+        }
+
+        document.getElementById('city-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                fetchWeather(this.value);
+            }
+        });
+
+        function useCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+                    fetchWeatherByCoords(lat, lon);
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function fetchWeatherByCoords(lat, lon) {
+            fetch(`/get-weather-by-coords?lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('today-temp').textContent = data.today.temperature;
+                    document.getElementById('today-rainfall').textContent = data.today.rainfall;
+                    document.getElementById('today-humidity').textContent = data.today.humidity;
+                    document.getElementById('today-pressure').textContent = data.today.pressure;
+
+                    document.getElementById('tomorrow-temp').textContent = data.tomorrow.temperature;
+                    document.getElementById('tomorrow-rainfall').textContent = data.tomorrow.rainfall;
+                    document.getElementById('tomorrow-humidity').textContent = data.tomorrow.humidity;
+                    document.getElementById('tomorrow-pressure').textContent = data.tomorrow.pressure;
+                })
+                .catch(error => console.error('Error fetching weather data:', error));
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Detection</title>
+    <style>
+        body, h1, h2, p, ul, li {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #2a2a2a;
+            border-top: 10px solid #009688;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            height: 20px;
+            text-align: center;
+        }
+
+        header a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav li {
+            margin-right: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .form-container, .results-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h1, h2,h4 {
+            color: #009688;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+
+        button {
+            display: inline-block;
+            background: #009688;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #007f6e;
+        }
+
+        /* Additional styles for results container */
+        .results-container {
+            color: #333;
+        }
+
+        .results-container h2,h4 {
+            margin-bottom: 15px;
+        }
+
+        .results-container p, .results-container ul {
+            margin-bottom: 10px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .results-container ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+
+        .results-container ul li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Farm AI Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/index">predictor</a></li>
+                <li><a href="/chat">chatBot</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/tracker">Tracker</a></li>
+                {% if session.loggedin %}
+                    <li><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a href="/">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <div class="form-container">
+                <h1>Plant Disease Detection</h1>
+                <form id="disease-detection-form" method="POST" action="/detect" enctype="multipart/form-data">
+                    <label for="plant-image">Upload Plant Image:</label>
+                    <input type="file" id="plant-image" name="plant-image" accept="image/*" required>
+                    
+                    <button type="submit">Detect Disease</button>
+                </form>
+            </div>
+            <div class="results-container">
+                <h2>Detection Results</h2>
+                <p id="detection-disease-name"></p>
+                <h4>Pesticide</h4>
+                <p id="detection-supplement-name"></p>
+                <h4>description</h4>
+                <p id="detection-description"></p>
+                <h4>possible-steps</h4>
+                <ul id="detection-possible-steps"></ul>
+            </div>
+        </div>
+    </main>
+    <script>
+        document.getElementById('disease-detection-form').onsubmit = function(event) {
+            event.preventDefault();
+            const imageInput = document.getElementById('plant-image');
+
+            if (imageInput.files.length === 0) {
+                alert("Please select an image to upload.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('plant-image', imageInput.files[0]);
+
+            // Display loading message or spinner
+            document.getElementById('detection-disease-name').textContent = 'Detecting disease, please wait...';
+            document.getElementById('detection-supplement-name').textContent = '';
+            document.getElementById('detection-description').textContent = '';
+            document.getElementById('detection-possible-steps').innerHTML = '';
+
+            fetch('/detect', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if(data.error) {
+                    document.getElementById('detection-disease-name').textContent = `Error: ${data.error}`;
+                    document.getElementById('detection-supplement-name').textContent = '';
+                    document.getElementById('detection-description').textContent = '';
+                    document.getElementById('detection-possible-steps').innerHTML = '';
+                } else {
+                    document.getElementById('detection-disease-name').textContent = `Disease Detected: ${data.diseaseName}`;
+                    document.getElementById('detection-supplement-name').textContent = ` ${data.supplementName}`;
+                    document.getElementById('detection-description').textContent = `${data.description}`;
+
+                    // Assuming possibleSteps is a comma-separated string
+                    const steps = data.possibleSteps.split(',').map(step => `<li>${step.trim()}</li>`).join('');
+                    document.getElementById('detection-possible-steps').innerHTML = steps;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('detection-disease-name').textContent = 'An error occurred during detection.';
+                document.getElementById('detection-supplement-name').textContent = '';
+                document.getElementById('detection-description').textContent = '';
+                document.getElementById('detection-possible-steps').innerHTML = '';
+            });
+        };
+    </script>
+</body>
+</html>
